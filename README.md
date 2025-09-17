@@ -21,7 +21,7 @@ View images, videos (files or YouTube links), webcam, etc directly in the termin
   - [Features](#features)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
-    - [Linux](#prerequisites-installation-on-linux)
+    - [Linux](#prerequisites-installation-on-ubuntu-linux)
     - [macOS](#prerequisites-installation-on-macos-homebrew)
     - [Windows](#prerequisites-installation-on-windows)
   - [Installation](#installation)
@@ -115,7 +115,7 @@ Minimal setup on macOS using Homebrew. Commands below set the needed env vars, r
 
 ```bash
 # 1) Install dependencies
-xcode-select --install 2>/dev/null || true
+xcode-select -p >/dev/null 2>&1 || xcode-select --install
 brew update
 brew install pkg-config cmake ninja opencv ffmpeg yt-dlp
 ```
@@ -261,7 +261,7 @@ tplay /dev/video0
 ```
 
 # Playback commands
-- `0-9` - change character map (with0 0
+- `0-9` - change character map
 - `space` - toggle pause/unpause
 - `g` - toggle grayscale/color
 - `m` - toggle mute/unmute
