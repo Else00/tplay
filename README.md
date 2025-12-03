@@ -21,7 +21,8 @@ View images, videos (files or YouTube links), webcam, etc directly in the termin
   - [Features](#features)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
-    - [Linux](#prerequisites-installation-on-linux)
+    - [Linux](#prerequisites-installation-on-ubuntu-linux)
+    - [macOS](#prerequisites-installation-on-macos-homebrew)
     - [Windows](#prerequisites-installation-on-windows)
   - [Installation](#installation)
     - [For users](#for-users)
@@ -84,7 +85,7 @@ Being a Rust crate, you will need to have Rust installed on your system. You can
 The following dependencies are also required:
 - [OpenCV 4](https://docs.opencv.org/4.11.0/d7/d9f/tutorial_linux_install.html) Tested with OpenCV 4.6, 4.10, 4.11.
 - [LLVM](https://github.com/llvm/llvm-project/releases/tag/llvmorg-16.0.0)
-- [ffmpeg](https://ffmpeg.org/download.html) Currently supported FFmpeg 6.1
+- [ffmpeg](https://ffmpeg.org/download.html) Tested with FFmpeg 6.1 (Linux) and 7.x (macOS/Homebrew)
 - Optional dependency for YouTube playback support: [yt-dlp](https://github.com/yt-dlp/yt-dlp/wiki/installation)
 - Optional dependency for audio playback via MPV: [MPV](https://mpv.io/installation/)
 
@@ -107,6 +108,45 @@ And install OpenCV following this guide https://docs.opencv.org/4.11.0/d7/d9f/tu
 Do not install via apt `libopencv-dev` as it's out of date.
 Note, I tested this by building openCV from source in the guide above, and at the end I invoked `sudo make install`. The guide doesn't recommend that and you may want to use an alternative method, but this is how I installed it.
 After installing OpenCV from source you may also need to add the folder where you built OpenCV to LD_LIBRARY_PATH, for example: `export LD_LIBRARY_PATH=/home/<your user>/build/lib:$LD_LIBRARY_PATH`
+
+## Prerequisites Installation on macOS (Homebrew)
+
+Minimal setup on macOS using Homebrew. Commands below set the needed env vars, run quick checks, then install.
+
+```bash
+# 1) Install dependencies
+xcode-select -p >/dev/null 2>&1 || xcode-select --install
+brew update
+brew install pkg-config cmake ninja opencv ffmpeg yt-dlp
+```
+
+```bash
+# 2) Session-only exports so pkg-config can find FFmpeg/OpenCV
+export PKG_CONFIG_PATH="$(brew --prefix)/lib/pkgconfig:$(brew --prefix)/share/pkgconfig:$(brew --prefix ffmpeg)/lib/pkgconfig:$(brew --prefix opencv)/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
+export OPENCV_INCLUDE_PATHS="$(brew --prefix opencv)/include/opencv4"
+export OPENCV_LINK_PATHS="$(brew --prefix opencv)/lib"
+```
+
+```bash
+# 3) Quick checks (should print versions)
+pkg-config --modversion libavutil
+pkg-config --modversion opencv4
+```
+
+```bash
+# 4) Install / update
+cargo install tplay         # fresh install
+# or
+cargo install tplay --force # update existing
+```
+
+**Troubleshooting (one-off FFmpeg selection):**
+If the FFmpeg check fails, try Homebrew’s versioned formula for this command only:
+
+```bash
+brew install ffmpeg@7
+PKG_CONFIG_PATH="$(brew --prefix ffmpeg@7)/lib/pkgconfig:$PKG_CONFIG_PATH" cargo install tplay
+```
 
 ## Prerequisites installation on Windows
 The crate can run on Windows and all prerequisites (opencv, ffmpeg) can be installed with vcpkg. However, the installation/setup process is lengthy and prone to errors. Performance is also very poor. Save yourself a headache: use WSL and follow the [Linux instructions](#prerequisites-installation-on-linux).
@@ -221,7 +261,7 @@ tplay /dev/video0
 ```
 
 # Playback commands
-- `0-9` - change character map (with0 0
+- `0-9` - change character map
 - `space` - toggle pause/unpause
 - `g` - toggle grayscale/color
 - `m` - toggle mute/unmute
